@@ -1,7 +1,5 @@
-﻿// POO_Ant_Alek.cpp : définit le point d'entrée de l'application.
-//
-// condition_variable::wait (with predicate)
-#include "traffic_light.hpp"
+﻿#include "traffic_light.hpp"
+#include "bus.hpp"
 #include "car.hpp"
 #include <cstdlib>
 #include <iostream> // std::cout
@@ -36,9 +34,6 @@ Traffic_color current_slave_traffic_light = Traffic_color::red;
 
 vector<Car> cars;
 mutex car_mutex;
-
-
-
 
 
 const sf::Color& get_SFML_color(const Traffic_light& traffic_light)
@@ -137,6 +132,49 @@ void run_all_voitures(vector<Car>& cars, stop_token stop_token) {
     }
 }
 
+void run_all_buses(vector<Bus>& buses, stop_token stop_token) {
+    while (!stop_token.stop_requested()) {
+        std::this_thread::sleep_for(10ms); // Pause pour simuler le délai
+
+        unique_lock<std::mutex> lock(bus_mutex); // Verrouiller pour travailler sur les bus
+        int indice = 0;
+
+        for (auto& bus : buses) {
+            bool is_blocked = false;
+
+            {
+                // Synchronisation avec les feux
+                std::unique_lock<std::mutex> traffic_lock(traffic_mutex);
+
+                if ((bus.getY() > 600 && bus.getAngle() == 270 && current_slave_traffic_light == Traffic_color::red) || // Bas vers Haut
+                    (bus.getY() < 200 && bus.getAngle() == 90 && current_slave_traffic_light == Traffic_color::red) ||  // Haut vers Bas
+                    (bus.getX() > 600 && bus.getAngle() == 180 && current_master_traffic_light == Traffic_color::red) || // Droite vers Gauche
+                    (bus.getX() < 200 && bus.getAngle() == 0 && current_master_traffic_light == Traffic_color::red)) {    // Gauche vers Droite
+                    is_blocked = true;
+                }
+            }
+
+            if (is_blocked) {
+                indice++;
+                continue;
+            }
+
+            bus.move();
+
+            if (bus.getPatern() == 1) {
+                bus.speedUp();
+            }
+
+            if (bus.getX() > 800 || bus.getY() > 800 || bus.getX() < 0 || bus.getY() < 0) {
+                buses.erase(buses.begin() + indice);
+                indice--;
+            }
+            indice++;
+        }
+    }
+}
+
+
 
 int main()
 {
@@ -158,6 +196,11 @@ int main()
     cars.push_back(Car(377, 0, 90, 0, 1));
     cars.push_back(Car(0, 417, 0, 0, 1));
     cars.push_back(Car(735, 377, 180, 0, 1));
+
+    buses.push_back(Bus(470, 735, 270, 0, 1));
+    buses.push_back(Bus(340, 0, 90, 0, 1));
+    buses.push_back(Bus(0, 455, 0, 0, 1));
+    buses.push_back(Bus(765, 340, 180, 0, 1));
 
     carSprite.setTexture(carImage);
     carSprite.setScale(sf::Vector2f(0.1, 0.1));

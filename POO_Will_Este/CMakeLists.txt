@@ -3,7 +3,7 @@
 #
 
 # Ajoutez une source à l'exécutable de ce projet.
-add_executable (POO_Will_Este "main.cpp"  "traffic_light.hpp" "traffic_light.cpp" "car.hpp" "car.cpp")
+add_executable (POO_Will_Este "main.cpp"  "traffic_light.hpp" "traffic_light.cpp" "car.hpp" "car.cpp" "bus.cpp")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET POO_Will_Este PROPERTY CXX_STANDARD 20)
