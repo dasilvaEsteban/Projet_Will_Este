@@ -1,10 +1,13 @@
 ﻿#include "traffic_light.hpp"
-#include "bus.hpp"
 #include "car.hpp"
+#include "bus.hpp"
 #include <cstdlib>
 #include <iostream> // std::cout
 #include <thread>   // std::thread, std::this_thread::yield
 #include <mutex>
+#include <vector>
+#include <tuple>
+#include <random>
 #include <vector>
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
@@ -34,7 +37,62 @@ Traffic_color current_slave_traffic_light = Traffic_color::red;
 
 vector<Car> cars;
 mutex car_mutex;
+vector<Bus> buses;
+mutex bus_mutex;
 
+
+// Coordonnées de spawn pour les voitures (globales)
+const std::vector<std::tuple<int, int, int>> car_spawn_points = {
+    {0, 417, 0},   // Gauche -> Droite
+    {377, 0, 90},  // Haut -> Bas
+    {735, 377, 180}, // Droite -> Gauche
+    {417, 735, 270} // Bas -> Haut
+};
+
+// Coordonnées de spawn pour les bus (globales)
+const std::vector<std::tuple<int, int, int>> bus_spawn_points = {
+    {0, 455, 0},   // Gauche -> Droite
+    {340, 0, 90},  // Haut -> Bas
+    {765, 340, 180}, // Droite -> Gauche
+    {470, 735, 270} // Bas -> Haut
+};
+
+
+void generate_cars(stop_token stop_token) {
+    std::mt19937 gen(std::random_device{}());
+    std::uniform_int_distribution<> dist(0, car_spawn_points.size() - 1);
+
+    while (!stop_token.stop_requested()) {
+        std::this_thread::sleep_for(1s);
+
+        // Sélectionner un point aléatoire depuis car_spawn_points
+        auto [x, y, angle] = car_spawn_points[dist(gen)];
+
+        // Ajouter une nouvelle voiture
+        {
+            std::lock_guard<std::mutex> lock(car_mutex);
+            cars.emplace_back(x, y, angle, 0, 1);
+        }
+    }
+}
+
+void generate_buses(stop_token stop_token) {
+    std::mt19937 gen(std::random_device{}());
+    std::uniform_int_distribution<> dist(0, bus_spawn_points.size() - 1);
+
+    while (!stop_token.stop_requested()) {
+        std::this_thread::sleep_for(2s);
+
+        // Sélectionner un point aléatoire depuis bus_spawn_points
+        auto [x, y, angle] = bus_spawn_points[dist(gen)];
+
+        // Ajouter un nouveau bus
+        {
+            std::lock_guard<std::mutex> lock(bus_mutex);
+            buses.emplace_back(x, y, angle, 0, 1);
+        }
+    }
+}
 
 const sf::Color& get_SFML_color(const Traffic_light& traffic_light)
 {
