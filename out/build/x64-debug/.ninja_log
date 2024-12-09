@@ -1,8 +1,6 @@
 # ninja log v5
 16	141	7550227589366921	POO_Will_Este/CMakeFiles/POO_Will_Este.dir/car.cpp.obj	20a79739531e8efe
 8	539	7550227593429342	POO_Will_Este/CMakeFiles/POO_Will_Este.dir/traffic_light.cpp.obj	e28663a1404bac25
-4	779	7550227595773333	POO_Will_Este/CMakeFiles/POO_Will_Este.dir/main.cpp.obj	36bf0ebbad31593a
-792	1586	7550227603590290	POO_Will_Este/POO_Will_Este.exe	6689381faf0a6a62
-126	921	7550257195432273	POO_Will_Este/CMakeFiles/POO_Will_Este.dir/bus.cpp.obj	dd96c9a0a057f0f8
 102	2341	7550257209592231	POO_Will_Este/CMakeFiles/POO_Will_Este.dir/main.cpp.obj	36bf0ebbad31593a
 2341	3726	7550257222442413	POO_Will_Este/POO_Will_Este.exe	cbec29338281f1aa
+126	921	7550257195432273	POO_Will_Este/CMakeFiles/POO_Will_Este.dir/bus.cpp.obj	dd96c9a0a057f0f8
